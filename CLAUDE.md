@@ -1,0 +1,2 @@
+Language rule: You must ALWAYS respond, analyze code, and write all explanations strictly in Russian (на русском языке). Do NOT write explanations in English.
+Tone: Direct, professional, highly technical, not chatty.
