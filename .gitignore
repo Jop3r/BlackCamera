@@ -1,0 +1,45 @@
+# Build outputs
+x64/
+dist/
+*.exe
+*.dll
+*.pdb
+*.ilk
+*.obj
+*.tlog
+*.idb
+*.lib
+*.exp
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.ncb
+*.opensdf
+*.sdf
+ipch/
+
+# Claude Code
+.claude/
+
+# Runtime config
+imgui.ini
+
+# Installer artifacts
+installer.iss
+app.ico
+app.png
+
+# Backup files
+*.backup
+*_backup.cpp
+*_gdi_backup.cpp
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# vcpkg (if used as submodule)
+vcpkg/
