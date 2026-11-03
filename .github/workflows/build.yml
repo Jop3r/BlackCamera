@@ -1,0 +1,44 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    env:
+      # Built vcpkg packages are cached between runs (the first run builds OpenCV and takes a while)
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\vcpkg-binary-cache
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: vcpkg-x64-windows-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-x64-windows-
+
+      - name: Create binary cache folder
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force "$env:VCPKG_DEFAULT_BINARY_CACHE" | Out-Null
+
+      - name: Set up vcpkg (same commit as builtin-baseline)
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: b46d9050a9d40d54d24cac3ef8d50402d421f598
+
+      - name: Configure, build and test
+        run: cmake --workflow --preset release
+
+      - name: Install to dist/
+        run: cmake --install build --config Release --prefix dist/BlackCamera
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BlackCamera-win64
+          path: dist/BlackCamera

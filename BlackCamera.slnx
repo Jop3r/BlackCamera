@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="BlackCamera/BlackCamera.vcxproj" Id="25b47c2e-4a03-421c-90a9-50b52b209a89" />
+</Solution>

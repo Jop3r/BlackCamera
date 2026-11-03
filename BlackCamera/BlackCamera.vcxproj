@@ -80,16 +80,18 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\x86-windows\include;$(VcpkgRoot)\installed\x86-windows\include\opencv4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
        <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\x86-windows\debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;d2d1.lib;dwrite.lib;dxgi.lib;glfw3dll.lib;imguid.lib;opengl32.lib;opencv_core4d.lib;opencv_imgproc4d.lib;opencv_highgui4d.lib;opencv_videoio4d.lib;opencv_video4d.lib;opencv_objdetect4d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d2d1.lib;dwrite.lib;glfw3dll.lib;imguid.lib;opengl32.lib;opencv_core4d.lib;opencv_imgproc4d.lib;opencv_highgui4d.lib;opencv_videoio4d.lib;opencv_video4d.lib;opencv_objdetect4d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y /D "$(VcpkgRoot)\installed\x86-windows\debug\bin\opencv_*d.dll" "$(OutDir)" >NUL 2>&amp;1
@@ -104,16 +106,18 @@ xcopy /Y /D "$(VcpkgRoot)\installed\x86-windows\debug\bin\glfw3.dll" "$(OutDir)"
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\x86-windows\include;$(VcpkgRoot)\installed\x86-windows\include\opencv4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
        <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\x86-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;d2d1.lib;dwrite.lib;dxgi.lib;glfw3dll.lib;imgui.lib;opengl32.lib;opencv_core4.lib;opencv_imgproc4.lib;opencv_highgui4.lib;opencv_videoio4.lib;opencv_video4.lib;opencv_objdetect4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d2d1.lib;dwrite.lib;glfw3dll.lib;imgui.lib;opengl32.lib;opencv_core4.lib;opencv_imgproc4.lib;opencv_highgui4.lib;opencv_videoio4.lib;opencv_video4.lib;opencv_objdetect4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y /D "$(VcpkgRoot)\installed\x86-windows\bin\opencv_*.dll" "$(OutDir)" >NUL 2>&amp;1
@@ -126,19 +130,22 @@ xcopy /Y /D "$(VcpkgRoot)\installed\x86-windows\bin\glfw3.dll" "$(OutDir)" >NUL 
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\x64-windows\include;$(VcpkgRoot)\installed\x64-windows\include\opencv4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\x64-windows\debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;d2d1.lib;dwrite.lib;dxgi.lib;glfw3dll.lib;imguid.lib;opengl32.lib;opencv_core4d.lib;opencv_imgproc4d.lib;opencv_highgui4d.lib;opencv_videoio4d.lib;opencv_video4d.lib;opencv_objdetect4d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d2d1.lib;dwrite.lib;glfw3dll.lib;imguid.lib;opengl32.lib;opencv_core4d.lib;opencv_imgproc4d.lib;opencv_highgui4d.lib;opencv_videoio4d.lib;opencv_video4d.lib;opencv_objdetect4d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(VcpkgRoot)\installed\x64-windows\debug\bin\*.dll" "$(OutDir)" &amp;gt;NUL 2&amp;gt;&amp;1</Command>
+      <Command>xcopy /Y /D "$(VcpkgRoot)\installed\x64-windows\debug\bin\*.dll" "$(OutDir)" &gt;NUL 2&gt;&amp;1
+copy /Y "$(ProjectDir)face_detection_yunet_2023mar.onnx" "$(OutDir)" &gt;NUL</Command>
       <Message>Copying OpenCV debug DLLs to output directory...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -148,25 +155,51 @@ xcopy /Y /D "$(VcpkgRoot)\installed\x86-windows\bin\glfw3.dll" "$(OutDir)" >NUL 
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(VcpkgRoot)\installed\x64-windows\include;$(VcpkgRoot)\installed\x64-windows\include\opencv4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(VcpkgRoot)\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;d2d1.lib;dwrite.lib;dxgi.lib;glfw3dll.lib;imgui.lib;opengl32.lib;opencv_core4.lib;opencv_imgproc4.lib;opencv_highgui4.lib;opencv_videoio4.lib;opencv_video4.lib;opencv_objdetect4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d2d1.lib;dwrite.lib;glfw3dll.lib;imgui.lib;opengl32.lib;opencv_core4.lib;opencv_imgproc4.lib;opencv_highgui4.lib;opencv_videoio4.lib;opencv_video4.lib;opencv_objdetect4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(VcpkgRoot)\installed\x64-windows\bin\*.dll" "$(OutDir)" &amp;gt;NUL 2&amp;gt;&amp;1</Command>
+      <Command>xcopy /Y /D "$(VcpkgRoot)\installed\x64-windows\bin\*.dll" "$(OutDir)" &gt;NUL 2&gt;&amp;1
+copy /Y "$(ProjectDir)face_detection_yunet_2023mar.onnx" "$(OutDir)" &gt;NUL</Command>
       <Message>Copying OpenCV release DLLs to output directory...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
 
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="platform.cpp" />
+    <ClCompile Include="log.cpp" />
+    <ClCompile Include="settings.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="face_tracker.cpp" />
+    <ClCompile Include="ascii_renderer.cpp" />
+    <ClCompile Include="obs_vcam.cpp" />
+    <ClCompile Include="pipeline.cpp" />
+    <ClCompile Include="gui.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="platform.h" />
+    <ClInclude Include="log.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="face_tracker.h" />
+    <ClInclude Include="ascii_renderer.h" />
+    <ClInclude Include="obs_vcam.h" />
+    <ClInclude Include="pipeline.h" />
+    <ClInclude Include="gui.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="face_detection_yunet_2023mar.onnx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
