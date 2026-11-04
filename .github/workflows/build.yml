@@ -3,25 +3,38 @@ name: build
 on:
   push:
     branches: [ master ]
+    # Docs-only changes (README, screenshots) do not need a 40-minute build
+    paths-ignore: [ '**.md', 'docs/**', 'LICENSE' ]
   pull_request:
+    paths-ignore: [ '**.md', 'docs/**', 'LICENSE' ]
   workflow_dispatch:
+
+# A newer push to the same branch or PR cancels the build that is still running
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VCPKG_COMMIT: b46d9050a9d40d54d24cac3ef8d50402d421f598
 
 jobs:
   windows:
     runs-on: windows-2022
     env:
-      # Built vcpkg packages are cached between runs (the first run builds OpenCV and takes a while)
+      # Built vcpkg packages are cached between runs. Only the first run (or a vcpkg.json change)
+      # builds OpenCV, protobuf and the rest from source, which takes about 40 minutes.
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\vcpkg-binary-cache
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Restore vcpkg binary cache
-        uses: actions/cache@v4
+        id: vcpkg-cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: vcpkg-x64-windows-${{ hashFiles('vcpkg.json') }}
-          restore-keys: vcpkg-x64-windows-
+          key: vcpkg-files-x64-windows-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-files-x64-windows-${{ env.VCPKG_COMMIT }}-
 
       - name: Create binary cache folder
         shell: pwsh
@@ -30,10 +43,24 @@ jobs:
       - name: Set up vcpkg (same commit as builtin-baseline)
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: b46d9050a9d40d54d24cac3ef8d50402d421f598
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
+
+      # run-vcpkg sets VCPKG_BINARY_SOURCES to the x-gha backend, which current vcpkg has removed,
+      # so nothing was cached. Point vcpkg at the folder that actions/cache saves instead.
+      - name: Use the cached folder as the vcpkg binary cache
+        shell: pwsh
+        run: '"VCPKG_BINARY_SOURCES=clear;files,$env:VCPKG_DEFAULT_BINARY_CACHE,readwrite" >> $env:GITHUB_ENV'
 
       - name: Configure, build and test
         run: cmake --workflow --preset release
+
+      # Saved even when the build or tests fail, so the next run does not rebuild the dependencies
+      - name: Save vcpkg binary cache
+        if: ${{ !cancelled() && steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
 
       - name: Install to dist/
         run: cmake --install build --config Release --prefix dist/BlackCamera
