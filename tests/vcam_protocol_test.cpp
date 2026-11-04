@@ -75,6 +75,12 @@ void testProtocol() {
     // Producer gone
     CHECK(vcam::readLatest(m.base(), frame.data(), t0 + 99 + vcam::kProducerTimeoutMs + 1) == vcam::ReadResult::NoProducer);
 
+    // A header tampered with after validation must not redirect reads or writes
+    for (auto& off : m.header()->slotOffset) off = ~0ull;
+    writeFrame(m.base(), 12, t0 + 150);
+    CHECK(vcam::readLatest(m.base(), frame.data(), t0 + 151) == vcam::ReadResult::Frame);
+    CHECK(uniform(frame, 12));
+
     // Slot being rewritten -> torn
     writeFrame(m.base(), 11, t0 + 200);
     const uint64_t latest = m.header()->latestFrame;

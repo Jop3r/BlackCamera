@@ -73,6 +73,12 @@ constexpr uint64_t kSlotStride  = alignUp(kFrameBytes, 4096);
 constexpr uint64_t kMappingBytes = kHeaderBytes + kSlotStride * kSlotCount;
 
 namespace detail {
+// Slot addresses always come from constants, never from the (writable by
+// other processes) header, so a tampered header cannot redirect a copy
+// outside the mapping. slotOffset[] is informational and only checked once.
+inline uint8_t* slotAddress(void* base, uint64_t frameNo) {
+    return static_cast<uint8_t*>(base) + kHeaderBytes + kSlotStride * (frameNo % kSlotCount);
+}
 // Ticks come from different processes, so "later" may read slightly smaller
 inline uint64_t elapsed(uint64_t now, uint64_t then) { return now > then ? now - then : 0; }
 inline uint64_t load(const uint64_t& v) {
@@ -117,7 +123,7 @@ inline uint8_t* beginWrite(void* base, uint64_t& frameNo) {
     const uint32_t slot = (uint32_t)(frameNo % kSlotCount);
     detail::store(h->slotFrame[slot], 0); // invalidate before touching the pixels
     std::atomic_thread_fence(std::memory_order_seq_cst);
-    return static_cast<uint8_t*>(base) + h->slotOffset[slot];
+    return detail::slotAddress(base, frameNo);
 }
 
 inline void endWrite(void* base, uint64_t frameNo, uint64_t nowTick) {
@@ -153,7 +159,7 @@ inline ReadResult readLatest(void* base, uint8_t* dst, uint64_t nowTick, uint64_
         if (frameNo == 0) return ReadResult::NoProducer;
         const uint32_t slot = (uint32_t)(frameNo % kSlotCount);
         if (detail::load(h->slotFrame[slot]) != frameNo) continue; // producer already reusing it
-        std::memcpy(dst, static_cast<const uint8_t*>(base) + h->slotOffset[slot], kFrameBytes);
+        std::memcpy(dst, detail::slotAddress(base, frameNo), kFrameBytes);
         std::atomic_thread_fence(std::memory_order_seq_cst);
         if (detail::load(h->slotFrame[slot]) == frameNo) {
             if (frameNoOut) *frameNoOut = frameNo;
