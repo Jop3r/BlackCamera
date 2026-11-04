@@ -6,6 +6,10 @@
 
 [![build](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml/badge.svg)](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml)
 
+![BlackCamera: изображение с камеры превращено в зелёные ASCII-символы](docs/screenshot.png)
+
+*Тема Matrix: камера направлена на фотографию человека.*
+
 ---
 
 ## Сборка

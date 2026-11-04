@@ -6,6 +6,10 @@ Real-time ASCII camera effect with a glyph-atlas renderer (DirectWrite + multith
 
 [![build](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml/badge.svg)](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml)
 
+![BlackCamera: camera image turned into green ASCII characters](docs/screenshot.png)
+
+*Matrix theme: the camera pointed at a photo of a person.*
+
 ---
 
 ## Build
