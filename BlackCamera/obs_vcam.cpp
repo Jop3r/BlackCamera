@@ -2,8 +2,6 @@
 
 #include <windows.h>
 
-#include <opencv2/imgproc.hpp>
-
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -84,13 +82,6 @@ VcamStatus ObsVirtualCamOutput::start(int width, int height, double fps) {
 void ObsVirtualCamOutput::send(const cv::Mat& bgr) {
     if (!ctrl_ || bgr.empty()) return;
 
-    const cv::Mat* src = &bgr;
-    if (bgr.cols != w_ || bgr.rows != h_) {
-        cv::resize(bgr, scaled_, cv::Size(w_, h_));
-        src = &scaled_;
-    }
-    cv::cvtColor(*src, i420_, cv::COLOR_BGR2YUV_I420); // planar: Y, U, V
-
     const uint32_t frameNo = std::atomic_ref<uint32_t>(ctrl_->framesWritten).fetch_add(1) + 1;
     uint8_t* slot = base_ + ctrl_->slotOffset[frameNo % kSlotCount];
 
@@ -98,17 +89,7 @@ void ObsVirtualCamOutput::send(const cv::Mat& bgr) {
         std::chrono::steady_clock::now().time_since_epoch()).count();
     std::memcpy(slot, &ts, sizeof(ts));
 
-    uint8_t* image = slot + kSlotPrefix;
-    const size_t lumaBytes = (size_t)w_ * h_;
-    std::memcpy(image, i420_.data, lumaBytes);
-
-    // I420 chroma planes -> NV12 interleaved UV, written straight into the slot
-    const int cw = w_ / 2, ch = h_ / 2;
-    const cv::Mat u(ch, cw, CV_8UC1, i420_.data + lumaBytes);
-    const cv::Mat v(ch, cw, CV_8UC1, i420_.data + lumaBytes + lumaBytes / 4);
-    cv::Mat uv(ch, cw, CV_8UC2, image + lumaBytes);
-    const cv::Mat planes[] = { u, v };
-    cv::merge(planes, 2, uv);
+    nv12_.convert(bgr, w_, h_, slot + kSlotPrefix);
 
     std::atomic_ref<uint32_t>(ctrl_->latestFrame).store(frameNo, std::memory_order_release);
     std::atomic_ref<uint32_t>(ctrl_->state).store(StateReady, std::memory_order_release);

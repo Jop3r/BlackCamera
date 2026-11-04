@@ -2,12 +2,13 @@
 ;
 ; Build it with tools\make-installer.ps1, which first produces:
 ;   dist\BlackCamera\            Release build + DLLs + model  (cmake --install)
+;                                 includes BlackCameraVCam.dll, the Windows 11 virtual camera source
 ;   build\redist\vc_redist.x64.exe  Microsoft Visual C++ Redistributable
 ; Output: dist\BlackCamera_Setup_v<version>.exe
 
 #define MyAppName "BlackCamera"
 #ifndef MyAppVersion
-  #define MyAppVersion "1.1.0"
+  #define MyAppVersion "1.2.0"
 #endif
 #define MyAppPublisher "Jop3r"
 #define MyAppURL "https://github.com/Jop3r/BlackCamera"
@@ -47,7 +48,11 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "dist\BlackCamera\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\BlackCamera\*"; DestDir: "{app}"; Excludes: "BlackCameraVCam.dll"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Media source of the built-in "BlackCamera" virtual camera (Windows 11 build 22000+ only).
+; regserver runs DllRegisterServer (HKLM, needed by the Frame Server service) and unregisters on uninstall.
+; The Frame Server may hold the DLL while an app uses the camera, hence the restart flags.
+Source: "dist\BlackCamera\BlackCameraVCam.dll"; DestDir: "{app}"; MinVersion: 10.0.22000; Flags: ignoreversion regserver restartreplace uninsrestartdelete
 Source: "build\redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Icons]

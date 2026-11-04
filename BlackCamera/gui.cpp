@@ -76,13 +76,41 @@ void ControlPanel::drawCameraSection() {
     }
 }
 
+void ControlPanel::drawOutputSection() {
+    ImGui::Text("Virtual Camera Output");
+    const char* backends[] = { "Auto (Windows 11 camera, else OBS)", "Windows 11 built-in camera", "OBS Virtual Camera" };
+    ImGui::Combo("Output", &ui_.vcamBackend, backends, IM_ARRAYSIZE(backends));
+
+    const VcamStatus st = pipeline_.vcamStatus();
+    if (pipeline_.vcamBackend() == VcamBackend::Obs) {
+        if (pipeline_.vcamFellBack()) ImGui::TextColored(kGray, "Windows 11 camera unavailable, using OBS (see log)");
+        switch (st) {
+            case VcamStatus::Streaming:    ImGui::TextColored(kGreen, "OBS Virtual Camera: STREAMING"); break;
+            case VcamStatus::Busy:         ImGui::TextColored(kOrange, "OBS Virtual Camera: BUSY (stop it in OBS)"); break;
+            case VcamStatus::NotInstalled: ImGui::TextColored(kRed, "OBS Virtual Camera: NOT INSTALLED"); break;
+            case VcamStatus::Error:        ImGui::TextColored(kRed, "OBS Virtual Camera: ERROR (retrying)"); break;
+            default:                       ImGui::TextColored(kGray, "OBS Virtual Camera: OFF"); break;
+        }
+        return;
+    }
+    switch (st) {
+        case VcamStatus::Streaming:    ImGui::TextColored(kGreen, "Windows Camera \"BlackCamera\": STREAMING"); break;
+        case VcamStatus::Waiting:      ImGui::TextColored(kGreen, "Windows Camera \"BlackCamera\": READY (pick it in your app)"); break;
+        case VcamStatus::Unsupported:  ImGui::TextColored(kRed, "Windows Camera: NEEDS WINDOWS 11"); break;
+        case VcamStatus::NotInstalled: ImGui::TextColored(kRed, "Windows Camera: NOT REGISTERED (reinstall BlackCamera)"); break;
+        case VcamStatus::Error:        ImGui::TextColored(kRed, "Windows Camera: REGISTRATION FAILED (retrying)"); break;
+        default:                       ImGui::TextColored(kGray, "Windows Camera: OFF"); break;
+    }
+}
+
 void ControlPanel::draw() {
     ImGui::Begin("BlackCamera Control Panel", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     if (ImGui::Button("Restore Default Settings")) {
-        const std::string camera = ui_.cameraName; // the device choice is not a "look" setting
+        const Settings kept = ui_; // device and output choices are not "look" settings
         ui_ = Settings{};
-        ui_.cameraName = camera;
+        ui_.cameraName = kept.cameraName;
+        ui_.vcamBackend = kept.vcamBackend;
         copyToBuffer(customCharset_, ui_.customCharset);
     }
     ImGui::Separator();
@@ -146,13 +174,8 @@ void ControlPanel::draw() {
     }
 
     ImGui::Separator();
-    switch (pipeline_.vcamStatus()) {
-        case VcamStatus::Streaming:    ImGui::TextColored(kGreen, "OBS Virtual Camera: STREAMING"); break;
-        case VcamStatus::Busy:         ImGui::TextColored(kOrange, "OBS Virtual Camera: BUSY (stop it in OBS)"); break;
-        case VcamStatus::NotInstalled: ImGui::TextColored(kRed, "OBS Virtual Camera: NOT INSTALLED"); break;
-        case VcamStatus::Error:        ImGui::TextColored(kRed, "OBS Virtual Camera: ERROR (retrying)"); break;
-        default:                       ImGui::TextColored(kGray, "OBS Virtual Camera: OFF"); break;
-    }
+    drawOutputSection();
+    ImGui::Separator();
     ImGui::Text("Worker Engine FPS: %.1f", pipeline_.workerFps());
     ImGui::Text("GUI Render FPS: %.1f", ImGui::GetIO().Framerate);
     ImGui::End();

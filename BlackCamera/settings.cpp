@@ -28,6 +28,7 @@ std::wstring Settings::charset() const {
 }
 
 void Settings::clamp() {
+    vcamBackend   = std::clamp(vcamBackend, 0, 2);
     brightness    = std::clamp(brightness, -100, 100);
     contrast      = std::clamp(contrast, 0.1f, 3.0f);
     blurSize      = std::clamp(blurSize, 1, 31) | 1; // odd
@@ -101,6 +102,7 @@ Settings loadSettings(const std::filesystem::path& path) {
     }
 
     parse(kv, "camera", s.cameraName);
+    parse(kv, "vcam_backend", s.vcamBackend);
     parse(kv, "brightness", s.brightness);
     parse(kv, "contrast", s.contrast);
     parse(kv, "blur", s.blurSize);
@@ -130,6 +132,7 @@ bool saveSettings(const Settings& s, const std::filesystem::path& path) {
     std::ostringstream out;
     out << "# BlackCamera settings (UTF-8). Delete this file to restore defaults.\n"
         << "camera="         << s.cameraName << '\n'
+        << "vcam_backend="   << s.vcamBackend << '\n'
         << "brightness="     << s.brightness << '\n'
         << "contrast="       << fmt(s.contrast) << '\n'
         << "blur="           << s.blurSize << '\n'

@@ -8,7 +8,7 @@
 struct CameraDevice {
     std::string name;  // friendly name (UTF-8)
     int index = -1;    // cv::CAP_MSMF device index
-    bool isOwnOutput = false; // our own OBS output device: never used as an input
+    bool isOwnOutput = false; // our own output device (OBS or BlackCamera virtual camera): never used as an input
 };
 
 // Media Foundation video capture devices, in the same order OpenCV's MSMF backend uses.

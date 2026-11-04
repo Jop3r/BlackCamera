@@ -12,6 +12,9 @@ struct Settings {
     // Camera
     std::string cameraName;              // friendly device name; empty = first available camera
 
+    // Output
+    int   vcamBackend   = 0;             // VcamBackend: 0 Auto (Windows 11 camera, else OBS), 1 Windows, 2 OBS
+
     // Image preprocessing
     int   brightness    = 0;             // additive offset [-100, 100]
     float contrast      = 1.0f;          // multiplier [0.1, 3.0]
