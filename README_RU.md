@@ -2,6 +2,8 @@
 
 Эффект ASCII-камеры в реальном времени с рендером через атлас глифов (DirectWrite + многопоточная сборка кадра на CPU). C++ порт test.py с существенным приростом производительности.
 
+Тот же эффект есть в виде фильтра для OBS Studio: [BlackCamera OBS](https://github.com/Jop3r/BlackCamera-OBS).
+
 [🇺🇸 English version](README.md)
 
 [![build](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml/badge.svg)](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml)

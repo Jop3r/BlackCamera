@@ -2,6 +2,8 @@
 
 Real-time ASCII camera effect with a glyph-atlas renderer (DirectWrite + multithreaded CPU compositing). C++ port of test.py with significant performance improvements.
 
+The same effect is also available as an OBS Studio filter: [BlackCamera OBS](https://github.com/Jop3r/BlackCamera-OBS).
+
 [🇷🇺 Русская версия](README_RU.md)
 
 [![build](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml/badge.svg)](https://github.com/Jop3r/BlackCamera/actions/workflows/build.yml)
