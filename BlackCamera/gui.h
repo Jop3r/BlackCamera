@@ -19,6 +19,7 @@ public:
 
 private:
     void drawCameraSection();
+    void drawOutputSection();
     void refreshCameras();
 
     SettingsStore& store_;

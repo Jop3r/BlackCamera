@@ -22,6 +22,7 @@ int main() {
     // Round trip of every field, including tricky strings
     Settings s;
     s.cameraName    = "Galaxy S21 FE 5G (Виртуальная камера Windows)";
+    s.vcamBackend   = 2;
     s.brightness    = -42;
     s.contrast      = 1.75f;
     s.blurSize      = 7;
@@ -46,12 +47,13 @@ int main() {
     // Out-of-range and garbage values are clamped or ignored
     {
         std::ofstream f(file, std::ios::binary | std::ios::trunc);
-        f << "contrast=99\nblur=4\ncolor_mode=17\nmin_font=abc\nunknown_key=1\nno equals sign\n";
+        f << "contrast=99\nblur=4\ncolor_mode=17\nvcam_backend=9\nmin_font=abc\nunknown_key=1\nno equals sign\n";
     }
     const Settings bad = loadSettings(file);
     CHECK(bad.contrast == 3.0f);
     CHECK(bad.blurSize == 5);
     CHECK(bad.colorMode == 5);
+    CHECK(bad.vcamBackend == 2);
     CHECK(bad.minFont == Settings{}.minFont);
 
     // Empty custom charset falls back to a usable palette

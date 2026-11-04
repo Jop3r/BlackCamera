@@ -15,12 +15,13 @@
 // The producer bumps `framesWritten`, fills slot (framesWritten % 3), then
 // publishes it through `latestFrame` and switches `state` to Ready.
 
+#include "nv12.h"
+#include "vcam_status.h"
+
 #include <opencv2/core.hpp>
 
 #include <cstddef>
 #include <cstdint>
-
-enum class VcamStatus : int { Off, NotInstalled, Busy, Error, Streaming };
 
 class ObsVirtualCamOutput {
 public:
@@ -57,5 +58,5 @@ private:
     uint8_t*      base_    = nullptr;
     ControlBlock* ctrl_    = nullptr;
     int           w_ = 0, h_ = 0;
-    cv::Mat       scaled_, i420_;
+    Nv12Converter nv12_;
 };

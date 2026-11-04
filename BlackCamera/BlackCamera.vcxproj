@@ -184,6 +184,9 @@ copy /Y "$(ProjectDir)face_detection_yunet_2023mar.onnx" "$(OutDir)" &gt;NUL</Co
     <ClCompile Include="face_tracker.cpp" />
     <ClCompile Include="ascii_renderer.cpp" />
     <ClCompile Include="obs_vcam.cpp" />
+    <ClCompile Include="nv12.cpp" />
+    <ClCompile Include="mf_vcam.cpp" />
+    <ClCompile Include="vcam_output.cpp" />
     <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="gui.cpp" />
   </ItemGroup>
@@ -195,6 +198,11 @@ copy /Y "$(ProjectDir)face_detection_yunet_2023mar.onnx" "$(OutDir)" &gt;NUL</Co
     <ClInclude Include="face_tracker.h" />
     <ClInclude Include="ascii_renderer.h" />
     <ClInclude Include="obs_vcam.h" />
+    <ClInclude Include="nv12.h" />
+    <ClInclude Include="mf_vcam.h" />
+    <ClInclude Include="vcam_output.h" />
+    <ClInclude Include="vcam_status.h" />
+    <ClInclude Include="vcam_shared.h" />
     <ClInclude Include="pipeline.h" />
     <ClInclude Include="gui.h" />
   </ItemGroup>

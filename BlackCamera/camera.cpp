@@ -24,7 +24,8 @@ constexpr int kRequestedFps = 60;
 constexpr int kOutputFps = 30;
 
 bool isOwnOutputName(const std::string& name) {
-    return name.find("OBS Virtual Camera") != std::string::npos;
+    // OBS output, or our own Windows 11 camera ("BlackCamera", maybe with a suffix Windows adds)
+    return name.find("OBS Virtual Camera") != std::string::npos || name.rfind("BlackCamera", 0) == 0;
 }
 
 } // namespace

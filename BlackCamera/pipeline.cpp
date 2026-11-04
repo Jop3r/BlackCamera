@@ -4,6 +4,7 @@
 #include "face_tracker.h"
 #include "log.h"
 #include "platform.h"
+#include "vcam_output.h"
 
 #include <windows.h>
 #include <objbase.h>
@@ -20,17 +21,6 @@ constexpr double kOutputFps = 30.0;
 constexpr int    kMaxFailedReads = 15;                         // then the camera is treated as gone
 constexpr auto   kReopenInterval = std::chrono::seconds(1);    // retry while offline
 constexpr auto   kPreferredCheckInterval = std::chrono::seconds(3); // look for the preferred camera while on a fallback
-constexpr auto   kVcamRetryInterval = std::chrono::seconds(2);
-
-const char* vcamStatusText(VcamStatus st) {
-    switch (st) {
-        case VcamStatus::Streaming:    return "streaming";
-        case VcamStatus::NotInstalled: return "not installed (install OBS Studio)";
-        case VcamStatus::Busy:         return "busy (stop the virtual camera in OBS), retrying";
-        case VcamStatus::Error:        return "failed to open shared memory, retrying";
-        default:                       return "off";
-    }
-}
 
 } // namespace
 
@@ -81,9 +71,7 @@ void Pipeline::run() {
         return;
     }
 
-    ObsVirtualCamOutput vcam;
-    VcamStatus lastVcamStatus = VcamStatus::Off;
-    Clock::time_point lastVcamAttempt{};
+    VirtualCameraOutput vcam;
 
     CameraSource camera;
     std::string requestedCamera;   // settings value the camera was opened for
@@ -158,18 +146,11 @@ void Pipeline::run() {
         const cv::Mat ascii = renderer.render(frame, fontSize, s, s.charset(), tracker.hud());
 
         // ── Outputs ─────────────────────────────────────────────────────────
-        if (!vcam.isOpen() && now - lastVcamAttempt > kVcamRetryInterval) {
-            // OBS may be busy or installed later
-            lastVcamAttempt = now;
-            VcamStatus st = vcam.start(outW_, outH_, kOutputFps);
-            vcamStatus_ = (int)st;
-            if (st != lastVcamStatus) {
-                lastVcamStatus = st;
-                if (st == VcamStatus::Streaming) LOG_INFO("OBS Virtual Camera: streaming %dx%d", outW_, outH_);
-                else LOG_WARN("OBS Virtual Camera: %s", vcamStatusText(st));
-            }
-        }
+        vcam.update((VcamBackend)s.vcamBackend, outW_, outH_, kOutputFps);
         vcam.send(ascii);
+        vcamStatus_ = (int)vcam.status();
+        vcamBackend_ = (int)vcam.activeBackend();
+        vcamFellBack_ = vcam.fellBack();
 
         cv::Mat rgb;
         cv::cvtColor(ascii, rgb, cv::COLOR_BGR2RGB);
