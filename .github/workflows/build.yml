@@ -23,7 +23,9 @@ jobs:
     env:
       # Built vcpkg packages are cached between runs. Only the first run (or a vcpkg.json change)
       # builds OpenCV, protobuf and the rest from source, which takes about 40 minutes.
-      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\vcpkg-binary-cache
+      # Own variable: run-vcpkg overrides VCPKG_DEFAULT_BINARY_CACHE with a random per-run folder,
+      # which actions/cache could never restore into.
+      VCPKG_CACHE_DIR: ${{ github.workspace }}/vcpkg-binary-cache
 
     steps:
       - uses: actions/checkout@v4
@@ -32,13 +34,13 @@ jobs:
         id: vcpkg-cache
         uses: actions/cache/restore@v4
         with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: vcpkg-files-x64-windows-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
-          restore-keys: vcpkg-files-x64-windows-${{ env.VCPKG_COMMIT }}-
+          path: ${{ env.VCPKG_CACHE_DIR }}
+          key: vcpkg-bin-x64-windows-${{ env.VCPKG_COMMIT }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-bin-x64-windows-${{ env.VCPKG_COMMIT }}-
 
       - name: Create binary cache folder
         shell: pwsh
-        run: New-Item -ItemType Directory -Force "$env:VCPKG_DEFAULT_BINARY_CACHE" | Out-Null
+        run: New-Item -ItemType Directory -Force "$env:VCPKG_CACHE_DIR" | Out-Null
 
       - name: Set up vcpkg (same commit as builtin-baseline)
         uses: lukka/run-vcpkg@v11
@@ -49,7 +51,7 @@ jobs:
       # so nothing was cached. Point vcpkg at the folder that actions/cache saves instead.
       - name: Use the cached folder as the vcpkg binary cache
         shell: pwsh
-        run: '"VCPKG_BINARY_SOURCES=clear;files,$env:VCPKG_DEFAULT_BINARY_CACHE,readwrite" >> $env:GITHUB_ENV'
+        run: '"VCPKG_BINARY_SOURCES=clear;files,$env:VCPKG_CACHE_DIR,readwrite" >> $env:GITHUB_ENV'
 
       - name: Configure, build and test
         run: cmake --workflow --preset release
@@ -59,7 +61,7 @@ jobs:
         if: ${{ !cancelled() && steps.vcpkg-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          path: ${{ env.VCPKG_CACHE_DIR }}
           key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
 
       - name: Install to dist/
