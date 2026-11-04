@@ -2,7 +2,7 @@
  * BlackCamera — Real-time ASCII camera effect
  * ── Glyph Atlas Renderer + Asynchronous Pipeline ─────────────────────────────
  *
- *   main.cpp           window, ImGui, preview texture
+ *   main.cpp           single-instance guard, window, ImGui, preview texture
  *   gui.*              control panel, settings persistence trigger
  *   pipeline.*         worker thread: camera -> tracker -> renderer -> OBS
  *   camera.*           device enumeration by name, capture, offline screen
@@ -40,6 +40,42 @@ namespace {
 
 constexpr int kOutputWidth = 1920;
 constexpr int kOutputHeight = 1080;
+
+constexpr char    kWindowTitle[]       = "BlackCamera";
+constexpr wchar_t kWindowTitleW[]      = L"BlackCamera";
+constexpr wchar_t kGlfwWindowClass[]   = L"GLFW30"; // GLFW 3.x default Win32 window class
+constexpr wchar_t kInstanceMutexName[] = L"Local\\BlackCameraSingleInstance";
+
+// A second copy would open the webcam the first one already holds, and OpenCV's MSMF
+// capture then fast-fails the process (0xC0000409) on its first read. So only one copy runs.
+// The mutex handle of the first instance stays open until the process exits.
+bool anotherInstanceRunning() {
+    HANDLE mutex = CreateMutexW(nullptr, FALSE, kInstanceMutexName);
+    const DWORD error = GetLastError();
+    if (mutex && error != ERROR_ALREADY_EXISTS) return false;
+    if (mutex) {
+        CloseHandle(mutex);
+        return true;
+    }
+    // Created by an elevated instance: the name exists, but we may not open it
+    if (error == ERROR_ACCESS_DENIED) return true;
+    LOG_WARN("Single-instance mutex unavailable (error %lu), starting anyway", error);
+    return false;
+}
+
+void focusRunningInstance() {
+    HWND hwnd = nullptr;
+    for (int attempt = 0; attempt < 30 && !hwnd; ++attempt) { // the first copy may still be starting
+        hwnd = FindWindowW(kGlfwWindowClass, kWindowTitleW);
+        if (!hwnd) Sleep(100);
+    }
+    if (!hwnd) {
+        LOG_WARN("Running instance has no window yet, nothing to focus");
+        return;
+    }
+    if (IsIconic(hwnd)) ShowWindow(hwnd, SW_RESTORE);
+    SetForegroundWindow(hwnd);
+}
 
 void fatal(const char* message) {
     LOG_ERROR("%s", message);
@@ -97,6 +133,12 @@ private:
 int main() {
     logging::init();
     LOG_INFO("BlackCamera starting, log: %s", platform::narrow(logging::logPath().wstring()).c_str());
+    if (anotherInstanceRunning()) {
+        LOG_INFO("BlackCamera is already running, bringing its window to the front");
+        focusRunningInstance();
+        logging::shutdown();
+        return 0;
+    }
     const bool comInitialized = SUCCEEDED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED)); // camera enumeration
 
     if (!glfwInit()) {
@@ -105,7 +147,7 @@ int main() {
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    GLFWwindow* window = glfwCreateWindow(1024, 768, "BlackCamera", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1024, 768, kWindowTitle, nullptr, nullptr);
     if (!window) {
         fatal("Failed to create the OpenGL window.");
         glfwTerminate();
