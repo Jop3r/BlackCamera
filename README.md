@@ -122,7 +122,7 @@ Output resolution is fixed at 1920x1080, 30 FPS.
 
 | File | Responsibility |
 |------|----------------|
-| `main.cpp` | Window, ImGui, preview texture |
+| `main.cpp` | Single-instance guard, window, ImGui, preview texture |
 | `gui.*` | Control panel, settings auto-save |
 | `pipeline.*` | Worker thread: camera → face tracker → renderer → virtual camera |
 | `camera.*` | Device enumeration by name (Media Foundation), capture, offline screen |
